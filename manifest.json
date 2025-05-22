@@ -1,6 +1,6 @@
 {
-  "name": "My Web App",
-  "short_name": "MyApp",
+  "name": "Megic_Calculator",
+  "short_name": "Calculator",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -8,7 +8,7 @@
   "icons": [
     {
       "src": "icon.png",
-      "sizes": "192x192",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
