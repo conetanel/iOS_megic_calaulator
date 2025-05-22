@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>iOS Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #000;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .calculator {
+      width: 320px;
+      background-color: #000;
+      border-radius: 30px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .display {
+      color: white;
+      font-size: 64px;
+      font-weight: 200;
+      text-align: right;
+      padding: 10px 0;
+      margin-bottom: 10px;
+      height: 80px;
+      overflow: hidden;
+      direction: rtl;
+      white-space: nowrap;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button {
+      border: none;
+      border-radius: 50%;
+      font-size: 28px;
+      height: 70px;
+      width: 70px;
+      color: white;
+      background-color: #333;
+      cursor: pointer;
+      font-weight: 400;
+      font-family: 'SF Pro Display', sans-serif;
+    }
+    .operator {
+      background-color: #f1a33c;
+      color: white;
+    }
+    .gray {
+      background-color: #a5a5a5;
+      color: black;
+    }
+    .zero {
+      grid-column: span 2;
+      border-radius: 35px;
+      text-align: left;
+      padding-left: 28px;
+      width: 100%;
+    }
+    button:active {
+      filter: brightness(1.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+      <button class="gray" onclick="clearDisplay()">C</button>
+      <button class="gray" onclick="toggleSign()">±</button>
+      <button class="gray" onclick="inputValue('%')">%</button>
+      <button class="operator" onclick="operate('/')">÷</button>
+
+      <button onclick="inputValue('7')">7</button>
+      <button onclick="inputValue('8')">8</button>
+      <button onclick="inputValue('9')">9</button>
+      <button class="operator" onclick="operate('*')">×</button>
+
+      <button onclick="inputValue('4')">4</button>
+      <button onclick="inputValue('5')">5</button>
+      <button onclick="inputValue('6')">6</button>
+      <button class="operator" onclick="operate('-')">−</button>
+
+      <button onclick="inputValue('1')">1</button>
+      <button onclick="inputValue('2')">2</button>
+      <button onclick="inputValue('3')">3</button>
+      <button class="operator" onclick="operate('+')">+</button>
+
+      <button class="zero" onclick="inputValue('0')">0</button>
+      <button onclick="inputValue('.')">.</button>
+      <button class="operator" onclick="calculate()">=</button>
+    </div>
+  </div>
+
+  <script>
+    let current = '0';
+    let previous = null;
+    let operator = null;
+    let equalPressCount = 0;
+    let lastResult = null;
+
+    function updateDisplay() {
+      const display = document.getElementById('display');
+      display.textContent = current;
+      const length = current.length;
+      if (length <= 7) {
+        display.style.fontSize = '64px';
+      } else if (length <= 10) {
+        display.style.fontSize = '48px';
+      } else if (length <= 14) {
+        display.style.fontSize = '36px';
+      } else {
+        display.style.fontSize = '28px';
+      }
+    }
+
+    function inputValue(num) {
+      if (current === '0' && num !== '.') {
+        current = num;
+      } else {
+        if (num === '.' && current.includes('.')) return;
+        current += num;
+      }
+      updateDisplay();
+    }
+
+    function clearDisplay() {
+      current = '0';
+      previous = null;
+      operator = null;
+      equalPressCount = 0;
+      lastResult = null;
+      updateDisplay();
+    }
+
+    function toggleSign() {
+      current = (parseFloat(current) * -1).toString();
+      updateDisplay();
+    }
+
+    function operate(op) {
+      if (operator !== null) calculate();
+      previous = current;
+      current = '0';
+      operator = op;
+      equalPressCount = 0;
+    }
+
+    function calculate() {
+      if (operator === null || previous === null) return;
+
+      equalPressCount++;
+
+      if (equalPressCount === 1) {
+        const prev = parseFloat(previous);
+        const curr = parseFloat(current);
+        let result;
+        switch (operator) {
+          case '+': result = prev + curr; break;
+          case '-': result = prev - curr; break;
+          case '*': result = prev * curr; break;
+          case '/': result = prev / curr; break;
+          case '%': result = prev % curr; break;
+        }
+        current = result.toString();
+        lastResult = current;
+        updateDisplay();
+      } else if (equalPressCount >= 2 && equalPressCount <= 5) {
+        if (lastResult) {
+          const digits = lastResult.length;
+          const min = Math.pow(10, digits - 1);
+          const max = Math.pow(10, digits) - 1;
+          current = Math.floor(Math.random() * (max - min + 1)) + min + '';
+          updateDisplay();
+        }
+      } else if (equalPressCount === 6 && lastResult) {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        let mm = now.getMonth() + 1;
+        mm = (mm >= 10 ? mm : mm.toString());
+        const yy = String(now.getFullYear()).slice(-2);
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const dateTimeNumber = parseInt(dd + mm + yy + hh + min);
+        const specialResult = (dateTimeNumber + 1) - parseInt(lastResult);
+        current = specialResult.toString();
+        updateDisplay();
+      }
+    }
+  </script>
+</body>
+</html>
