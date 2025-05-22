@@ -95,6 +95,11 @@
     button:active {
       filter: brightness(1.2);
     }
+    button.operator.active-operator {
+  background-color: white !important;
+  color: #f1a33c !important;
+  transition: background-color 0.3s, color 0.3s;
+}
   </style>
 </head>
 <body>
@@ -173,15 +178,26 @@
       updateDisplay();
     }
 
-    function operate(op) {
+        function operate(op) {
       if (operator !== null) calculate();
+    
+      // הסרת הדגשה מכפתור קודם
+      document.querySelectorAll('.operator').forEach(btn => btn.classList.remove('active-operator'));
+    
+      // מציאת הכפתור שנלחץ
+      const opMap = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+      const button = Array.from(document.querySelectorAll('.operator'))
+        .find(btn => btn.textContent === opMap[op]);
+      if (button) button.classList.add('active-operator');
+    
       previous = current;
       current = '0';
       operator = op;
       equalPressCount = 0;
     }
-
     function calculate() {
+            // איפוס הדגשת כפתור לאחר חישוב
+      document.querySelectorAll('.operator').forEach(btn => btn.classList.remove('active-operator'));
       if (operator === null || previous === null) return;
 
       equalPressCount++;
