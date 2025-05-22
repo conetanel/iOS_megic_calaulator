@@ -2,29 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>iOS Calculator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      touch-action: none;
+    }
+
     body {
       background-color: #000;
       font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      margin: 0;
-      padding: 0;
+      position: fixed;
+      inset: 0; /* top: 0; right: 0; bottom: 0; left: 0 */
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
     }
+
     .calculator {
-      width: 320px;
+      width: 100%;
+      max-width: 420px;
       background-color: #000;
       border-radius: 30px;
       padding: 20px;
       box-sizing: border-box;
     }
+
     .display {
       color: white;
       font-size: 64px;
@@ -37,11 +48,13 @@
       direction: rtl;
       white-space: nowrap;
     }
+
     .buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
     }
+
     button {
       border: none;
       border-radius: 50%;
@@ -54,14 +67,17 @@
       font-weight: 400;
       font-family: 'SF Pro Display', sans-serif;
     }
+
     .operator {
       background-color: #f1a33c;
       color: white;
     }
+
     .gray {
       background-color: #a5a5a5;
       color: black;
     }
+
     .zero {
       grid-column: span 2;
       border-radius: 35px;
@@ -69,6 +85,7 @@
       padding-left: 28px;
       width: 100%;
     }
+
     button:active {
       filter: brightness(1.2);
     }
@@ -199,6 +216,10 @@
         updateDisplay();
       }
     }
+
+    document.addEventListener('touchmove', function(e) {
+      e.preventDefault();
+    }, { passive: false });
   </script>
 </body>
 </html>
