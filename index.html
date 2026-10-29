@@ -32,7 +32,7 @@
       height: 100%;
       width: 100%;
       overflow: hidden;
-      touch-action: none; /* נועל כל ניסיון גלילה של הדפדפן */
+      touch-action: none; 
       background-color: var(--bg-color);
       font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
       user-select: none;
@@ -53,7 +53,7 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end; /* נצמד למטה */
+      justify-content: flex-end; 
       padding: 0 16px;
       box-sizing: border-box;
       padding-bottom: max(16px, env(safe-area-inset-bottom));
@@ -83,17 +83,17 @@
       -webkit-backdrop-filter: blur(10px);
     }
 
-    /* אזור התצוגה המרכזי - עכשיו מתכווץ אוטומטית (flex: 1) */
+    /* אזור התצוגה המרכזי */
     .display-container {
       width: 100%;
-      flex: 1; /* תופס את המקום שנותר ולא דוחף את המסך למעלה! */
+      flex: 1; 
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       justify-content: flex-end;
       padding: 0 10px 10px 10px;
       box-sizing: border-box;
-      min-height: 80px; /* מוקטן משמעותית כדי לא לחסום */
+      min-height: 80px; 
     }
 
     .equation {
@@ -117,11 +117,11 @@
       line-height: 1;
     }
 
-    /* גריד הכפתורים - עכשיו מוגן מפני מתיחות */
+    /* גריד הכפתורים */
     .buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: min(3.5vw, 14px); /* ריווח שמתכווץ במסכים קטנים */
+      gap: min(3.5vw, 14px); 
       width: 100%;
       padding: 0 4px;
       box-sizing: border-box;
@@ -130,10 +130,11 @@
     button {
       border: none;
       border-radius: 50%;
-      font-size: min(10vw, 42px); /* פונט רספונסיבי */
+      /* הגודל הפנימי שממנו נגזר כל שאר העיצוב */
+      font-size: min(10vw, 42px); 
       aspect-ratio: 1 / 1;
       width: 100%;
-      min-width: 0; /* קריטי! מאפשר לכפתור להתכווץ בגריד */
+      min-width: 0; 
       min-height: 0;
       color: white;
       background-color: var(--btn-num);
@@ -164,7 +165,7 @@
     }
 
     .btn-top-text {
-      font-size: min(8vw, 34px); /* פונט רספונסיבי ל-AC ו-% */
+      font-size: min(8vw, 34px); 
       font-weight: 400;
     }
 
@@ -183,14 +184,11 @@
       fill: var(--btn-orange);
     }
 
-    /* אייקוני ה-SVG מתאימים את עצמם לכפתור ולא פורצים אותו */
+    /* תיקון ספארי: במקום אחוזים, שימוש ב-em שמסתנכרן עם גודל הפונט שנקבע למעלה */
     .icon-svg {
-      width: 65%;
-      height: 65%;
-      max-width: 40px;
-      max-height: 40px;
+      width: 1em;
+      height: 1em;
       fill: currentColor;
-      
     }
 
     #decimalSpan {
@@ -221,8 +219,8 @@
     <div class="buttons">
       <!-- שורה 1 -->
       <button class="btn-top" onclick="handleBackspace()">
-        <!-- מחיקה - עובד באחוזים כדי למנוע חריגה מהכפתור -->
-        <svg style="width: 100%; height: 100%; max-width: 43px; max-height: 43px; fill: none; stroke: white; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 32 32">
+        <!-- תיקון מחיקה: width ו-height ב-em מבטיחים שזה יופיע תמיד ויהיה רספונסיבי -->
+        <svg style="width: 1.2em; height: 1.2em; fill: none; stroke: white; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 32 32">
           <path d="M 21.62 6.56 L 12.3 6.56 L 4.62 15.2 L 12.3 23.84 L 21.62 23.84 C 24.21 23.84 25.94 22.11 25.94 19.52 L 25.94 10.88 C 25.94 8.29 24.21 6.56 21.62 6.56 Z M 21.9 10.88 L 13.26 19.52 M 13.26 10.88 L 21.9 19.52" />
         </svg>
       </button>
@@ -258,7 +256,8 @@
 
       <!-- שורה 5 -->
       <button onclick="toggleSign()">
-        <svg style="width: 100%; height: 100%; max-width: 48px; max-height: 48px; fill: none; stroke: white; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 32 32">
+        <!-- תיקון הפלוס-מינוס באותה דרך -->
+        <svg style="width: 1.2em; height: 1.2em; fill: none; stroke: white; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 32 32">
           <line x1="21" y1="10" x2="11" y2="22" />
           <line x1="9" y1="13" x2="14" y2="13" />
           <line x1="11.5" y1="10.5" x2="11.5" y2="15.5" />
@@ -317,7 +316,6 @@
       if (current === '0' && previous === null) clearBtn.textContent = 'AC';
       else clearBtn.textContent = 'C';
 
-      // התאמת הגודל במסך
       const len = formatted.length;
       if (len <= 6) display.style.fontSize = '88px';
       else if (len <= 9) display.style.fontSize = '68px';
