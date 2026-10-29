@@ -2,255 +2,515 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Calculator</title>
+  
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="MyApp">
-  <link rel="apple-touch-icon" href="icon.png">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Calculator">
+  <meta name="theme-color" content="#000000">
+  <link rel="apple-touch-icon" href="icon.png"> 
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@200;300;400;500&display=swap" rel="stylesheet">
+  
   <style>
+    :root {
+      --bg-color: #000000;
+      --btn-num: #333333;       
+      --btn-top: #5c5c5f;       
+      --btn-orange: #ff9f0a;    
+      --text-main: #ffffff;
+      --text-eq: #a1a1a1;       
+    }
+
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
       overflow: hidden;
-      touch-action: none;
+      touch-action: manipulation;
+      background-color: var(--bg-color);
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-        body {
-      background-color: #000;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    body {
       position: fixed;
       inset: 0;
       display: flex;
-      justify-content: center;
-      align-items: flex-end; /* הצמדה לתחתית */
+      flex-direction: column;
+      align-items: center;
     }
-
 
     .calculator {
       width: 100%;
       max-width: 420px;
-      background-color: #000;
-      border-radius: 30px;
-      padding: 20px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 16px;
       box-sizing: border-box;
-      margin-bottom: 50px; /* רווח מהתחתית */
-      transform: scale(1.1); /* הגדלה של 10% */
-      transform-origin: bottom center; /* שיישאר ממורכז ויוצמד למטה */
+      padding-bottom: max(32px, env(safe-area-inset-bottom));
+    }
+
+    /* שורת האייקונים העליונה - מראה זכוכית */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 4px;
+      margin-top: env(safe-area-inset-top);
+      box-sizing: border-box;
+    }
+
+    .top-icon {
+      width: 36px;
+      height: 36px;
+      background-color: rgba(28, 28, 30, 0.8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .display-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 0 12px 16px 12px;
+      box-sizing: border-box;
+      min-height: 150px;
+    }
+
+    .equation {
+      color: var(--text-eq);
+      font-size: 28px;
+      font-weight: 300;
+      min-height: 34px;
+      margin-bottom: 2px;
+      direction: ltr;
+      letter-spacing: 0.5px;
     }
 
     .display {
-    color: white;
-    font-size: 64px;
-    font-weight: 200;
-    text-align: right;
-    padding: 10px 20px 10px 0; /* ימין=20px */
-    margin-bottom: 10px;
-    height: 80px;
-    overflow: hidden;
-    direction: rtl;
-    white-space: nowrap;
-  }
+      color: var(--text-main);
+      font-weight: 200; 
+      text-align: right;
+      direction: ltr;
+      white-space: nowrap;
+      transition: font-size 0.1s ease;
+      font-size: 96px; 
+      line-height: 1;
+    }
 
-
+    /* גריד הכפתורים */
     .buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      grid-column-gap: 9px; /* ריווח בין טורים */
-      grid-row-gap: 10px;    /* ריווח בין שורות */
+      gap: 14px;
+      width: 100%;
+      padding: 0 4px;
+      box-sizing: border-box;
     }
 
     button {
       border: none;
       border-radius: 50%;
-      font-size: 33.6px;
-      height: 70px;
-      width: 70px;
+      font-size: 42px;
+      aspect-ratio: 1 / 1;
+      width: 100%;
       color: white;
-      background-color: #333;
+      background-color: var(--btn-num);
       cursor: pointer;
       font-weight: 400;
-      font-family: 'SF Pro Display', sans-serif;
+      font-family: inherit;
       display: flex;
       align-items: center;
       justify-content: center;
+      /* אפקט הזכוכית והאינר גלואו! */
+      box-shadow: inset 0px 0.3px 3px rgba(255, 255, 255, 0.18), 
+                  inset 0px -0.3px 3px rgba(0, 0, 0, 0.2);
+      border: 0.5px solid rgba(0, 0, 0, 0.4);
+      
+      /* אנימציית הליקוויד */
+      transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                  box-shadow 0.1s ease, 
+                  background-color 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+
+    /* אפקט הלחיצה - צל פנימי שחור לשקיעה לתוך המסך */
+    button.pressing {
+      transform: scale(0.98);
+      box-shadow: inset 0px 0.3px 3px rgba(0, 0, 0, 0.35) !important;
+      opacity: 0.85;
+    }
+
+    .btn-top {
+      background-color: var(--btn-top);
+      box-shadow: inset 0px 0.3px 3px rgba(255, 255, 255, 0.25), 
+                  inset 0px -0.5px 1px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-top-text {
+      font-size: 33px; 
+      font-weight: 400;
+    }
+
+    .btn-top-tex {
+      font-size: 38px; 
+      font-weight: 400;
     }
 
     .operator {
-      background-color: #f1a33c;
+      background-color: var(--btn-orange);
+      box-shadow: inset 0px 1.5px 2px rgba(255, 255, 255, 0.35), 
+                  inset 0px -0.5px 1px rgba(0, 0, 0, 0.2);
       color: white;
     }
 
-    .gray {
-      background-color: #a5a5a5;
-      color: black;
+    .operator.active-operator {
+      background-color: white !important;
+      color: var(--btn-orange) !important;
+      box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .operator.active-operator svg {
+      fill: var(--btn-orange);
     }
 
-    .zero {
-      grid-column: span 2;
-      border-radius: 35px;
-      text-align: left;
-      padding-left: 28px;
-      width: 100%;
-      justify-content: flex-start;
+    .icon-svg {
+      width: 50px;
+      height: 50px;
+      fill: currentColor;
     }
 
-    button:active {
-      filter: brightness(1.2);
+    #decimalSpan {
+      display: inline-block;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform: translateY(0px);
     }
-    button.operator.active-operator {
-  background-color: white !important;
-  color: #f1a33c !important;
-  transition: background-color 0.3s, color 0.3s;
-}
   </style>
 </head>
 <body>
-  <div class="calculator">
-    <div class="display" id="display">0</div>
-    <div class="buttons">
-      <button class="gray" onclick="clearDisplay()">C</button>
-      <button class="gray" onclick="toggleSign()">±</button>
-      <button class="gray" onclick="inputValue('%')">%</button>
-      <button class="operator" onclick="operate('/')">÷</button>
 
+  <div class="calculator">
+    
+    <div class="top-bar">
+      <div class="top-icon">
+        <svg style="width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="top-icon">
+        <svg style="width:16px; height:16px;" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" rx="3"><rect x="4" y="2" width="16" height="20" rx="3"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/></svg>
+      </div>
+    </div>
+
+    <div class="display-container" id="displayContainer">
+      <div class="equation" id="equationDisplay"></div>
+      <div class="display" id="display">0</div>
+    </div>
+    
+    <div class="buttons">
+      <!-- שורה 1 -->
+      <button class="btn-top" onclick="handleBackspace()">
+        <!-- אייקון מחיקה מוגדל בצורה משמעותית -->
+        <svg style="width: 60px; height: 60px; fill: none; stroke: white; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 32 32">
+          <path d="M 20.56 8 L 12.8 8 L 6.4 15.2 L 12.8 22.4 L 20.56 22.4 C 22.72 22.4 24.16 20.96 24.16 18.8 L 24.16 11.6 C 24.16 9.44 22.72 8 20.56 8 Z M 20.8 11.6 L 13.6 18.8 M 13.6 11.6 L 20.8 18.8" />
+          
+        </svg>
+      </button>
+      <button class="btn-top btn-top-text" id="clearBtn" onclick="handleClear()">AC</button>
+      <button class="btn-top btn-top-tex" onclick="percentage()">%</button>
+      <button class="operator" onclick="operate('/')" id="op-div">
+        <svg class="icon-svg" viewBox="0 0 40 40"><circle cx="20" cy="13" r="1.8"/><circle cx="20" cy="27" r="1.8"/><path d="M 9 20.9 L 30 20.9 C 31 20.9 31 18.9 30 18.9 L 10 18.9 C 9 18.9 9 20.9 10 20.9"/></svg>
+      </button>
+
+      <!-- שורה 2 -->
       <button onclick="inputValue('7')">7</button>
       <button onclick="inputValue('8')">8</button>
       <button onclick="inputValue('9')">9</button>
-      <button class="operator" onclick="operate('*')">×</button>
+      <button class="operator" onclick="operate('*')" id="op-mul">
+        <svg class="icon-svg" viewBox="0 0 40 40"><path d="M 21.696 20 l 7.104 -7.2 c 1.6 -1.6 0 -3.2 -1.6 -1.6 L 20 18.304 l -7.2 -7.104 c -1.6 -1.6 -3.2 0 -1.696 1.696 L 18.304 20 l -7.104 7.2 c -1.6 1.6 0 3.2 1.696 1.696 L 20 21.696 l 7.2 7.104 c 1.6 1.6 3.2 0 1.6 -1.6 L 21.696 20 z M 20 20"/></svg>
+      </button>
 
+      <!-- שורה 3 -->
       <button onclick="inputValue('4')">4</button>
       <button onclick="inputValue('5')">5</button>
       <button onclick="inputValue('6')">6</button>
-      <button class="operator" onclick="operate('-')">−</button>
+      <button class="operator" onclick="operate('-')" id="op-sub">
+        <svg class="icon-svg" viewBox="0 0 40 40"><path d="M 21.1993 21.1992 l 10.1145 -0.0679 c 2.2627 -0 2.2627 -2.2627 -0 -2.2627 L 21.1993 18.8007 L 18.8007 18.8007 l -10.1145 0.0679 c -2.2627 -0 -2.2627 2.2627 0 2.3985 L 18.8007 21.1992 L 21.1993 21.1992 z M 20 20"/></svg>
+      </button>
 
+      <!-- שורה 4 -->
       <button onclick="inputValue('1')">1</button>
       <button onclick="inputValue('2')">2</button>
       <button onclick="inputValue('3')">3</button>
-      <button class="operator" onclick="operate('+')">+</button>
+      <button class="operator" onclick="operate('+')" id="op-add">
+        <svg class="icon-svg" viewBox="0 0 40 40"><path d="M 21.1993 21.1992 l 10.1145 -0.0679 c 2.2627 -0 2.2627 -2.2627 -0 -2.2627 L 21.1993 18.8007 l -0.0679 -10.1145 c -0 -2.2627 -2.2627 -2.2627 -2.3985 0 L 18.8007 18.8007 l -10.1145 0.0679 c -2.2627 -0 -2.2627 2.2627 0 2.3985 L 18.8007 21.1992 l 0.0679 10.1145 c 0 2.2627 2.2627 2.2627 2.2627 -0 L 21.1993 21.1992 z M 20 20"/></svg>
+      </button>
 
-      <button class="zero" onclick="inputValue('0')">0</button>
-      <button onclick="inputValue('.')">.</button>
-      <button class="operator" onclick="calculate()">=</button>
+      <!-- שורה 5 -->
+      <button onclick="toggleSign()">
+        <!-- אייקון +/- מוגדל ועבה בהרבה -->
+        <svg style="width: 48px; height: 48px; fill: none; stroke: white; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 32 32">
+          <line x1="21" y1="10" x2="11" y2="22" />
+          <line x1="9" y1="13" x2="14" y2="13" />
+          <line x1="11.5" y1="10.5" x2="11.5" y2="15.5" />
+          <line x1="18" y1="19" x2="23" y2="19" />
+        </svg>
+      </button>
+      <button onclick="inputValue('0')">0</button>
+      <button onclick="inputValue('.')"><span id="decimalSpan">.</span></button>
+      <button class="operator" id="calcBtn">
+        <svg class="icon-svg" viewBox="0 0 40 40"><path d="M28.8 18H11.2C9.6 18 9.6 16 11.2 16L28.8 16C30.4 16 30.4 18 28.8 18M28.8 23 11.2 23C9.6 23 9.6 25 11.2 25L28.8 25C30.4 25 30.4 23 28.8 23M20 17"/></svg>
+      </button>
     </div>
   </div>
 
   <script>
-    let current = '0';
+    let current = '0'; 
     let previous = null;
     let operator = null;
-    let equalPressCount = 0;
-    let lastResult = null;
+    let isNewNumber = true; 
+
+    // משתני קסם
+    let isMagicArmed = false;
+    let targetDifferenceStr = ""; 
+    let magicTypeIndex = 0; 
+    let isLongPressAction = false;
+
+    const display = document.getElementById('display');
+    const equationDisplay = document.getElementById('equationDisplay');
+    const clearBtn = document.getElementById('clearBtn');
+    const decimalSpan = document.getElementById('decimalSpan');
+    const calcBtn = document.getElementById('calcBtn');
+
+    const opTextMap = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+    const opIdMap = { '+': 'op-add', '-': 'op-sub', '*': 'op-mul', '/': 'op-div' };
+
+    function formatNumber(numStr) {
+      if (!numStr) return '';
+      if (numStr === 'Error' || numStr === 'NaN') return 'Error';
+      const parts = numStr.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return parts.join('.');
+    }
 
     function updateDisplay() {
-      const display = document.getElementById('display');
-      display.textContent = current;
-      const length = current.length;
-      if (length <= 7) {
-        display.style.fontSize = '80px';
-      } else if (length <= 10) {
-        display.style.fontSize = '60px';
-      } else if (length <= 14) {
-        display.style.fontSize = '42px';
+      const formatted = formatNumber(current);
+      display.textContent = formatted;
+
+      if (previous !== null && operator !== null) {
+         let eqStr = formatNumber(previous) + opTextMap[operator];
+         if (!isNewNumber) eqStr += formatNumber(current);
+         equationDisplay.textContent = eqStr;
       } else {
-        display.style.fontSize = '32px';
+         equationDisplay.textContent = '';
       }
+
+      if (current === '0' && previous === null) clearBtn.textContent = 'AC';
+      else clearBtn.textContent = 'C';
+
+      const len = formatted.length;
+      if (len <= 6) display.style.fontSize = '96px';
+      else if (len <= 9) display.style.fontSize = '74px';
+      else if (len <= 11) display.style.fontSize = '60px';
+      else if (len <= 14) display.style.fontSize = '48px';
+      else display.style.fontSize = '40px';
+    }
+
+    function haptic() {
+      if (navigator.vibrate) navigator.vibrate(25);
     }
 
     function inputValue(num) {
-      if (current === '0' && num !== '.') {
-        current = num;
+      if (isMagicArmed && operator === '+') {
+        if (magicTypeIndex < targetDifferenceStr.length) {
+          const fakeNum = targetDifferenceStr.charAt(magicTypeIndex);
+          if (isNewNumber) { current = fakeNum; isNewNumber = false; } 
+          else { current += fakeNum; }
+          magicTypeIndex++;
+          updateDisplay();
+        }
+        return; 
+      }
+
+      if (isNewNumber) {
+        current = (num === '.') ? '0.' : num;
+        isNewNumber = false;
       } else {
         if (num === '.' && current.includes('.')) return;
         current += num;
       }
+      
+      if(current.replace('.','').length > 15) current = current.slice(0, 16);
       updateDisplay();
     }
 
-    function clearDisplay() {
-      current = '0';
-      previous = null;
+    function operate(op) {
+      if (operator !== null && !isNewNumber) doCalculate();
+      
+      document.querySelectorAll('.operator').forEach(btn => btn.classList.remove('active-operator'));
+      const activeBtn = document.getElementById(opIdMap[op]);
+      if (activeBtn) activeBtn.classList.add('active-operator');
+
+      previous = current;
+      operator = op;
+      isNewNumber = true;
+
+      if (isMagicArmed && op === '+') calculateMagicDifference();
+      updateDisplay();
+    }
+
+    function doCalculate() {
+      if (operator === null || previous === null) return;
+      let prev = parseFloat(previous);
+      let curr = parseFloat(current);
+      let result;
+
+      switch (operator) {
+        case '+': result = prev + curr; break;
+        case '-': result = prev - curr; break;
+        case '*': result = prev * curr; break;
+        case '/': result = (curr === 0) ? 'Error' : prev / curr; break;
+      }
+
+      if(typeof result === 'number') result = Math.round(result * 10000000000) / 10000000000;
+      
+      current = result.toString();
       operator = null;
-      equalPressCount = 0;
-      lastResult = null;
+      previous = null;
+      isNewNumber = true;
+
+      if (isMagicArmed) {
+        isMagicArmed = false;
+        magicTypeIndex = 0;
+        decimalSpan.style.transform = 'translateY(0px)';
+      }
+      updateDisplay();
+    }
+
+    function handleClear() {
+      if (clearBtn.textContent === 'AC') { previous = null; operator = null; isMagicArmed = false; decimalSpan.style.transform = 'translateY(0px)'; }
+      current = '0'; isNewNumber = true;
+      document.querySelectorAll('.operator').forEach(b => b.classList.remove('active-operator'));
+      updateDisplay();
+    }
+
+    function handleBackspace() {
+      if (!isNewNumber && current.length > 1) { current = current.slice(0, -1); if(current === '-' || current === '') current = '0'; } 
+      else { current = '0'; isNewNumber = true; }
       updateDisplay();
     }
 
     function toggleSign() {
-      current = (parseFloat(current) * -1).toString();
-      updateDisplay();
+      if (current !== '0') { current = current.startsWith('-') ? current.substring(1) : '-' + current; updateDisplay(); }
     }
 
-        function operate(op) {
-      if (operator !== null) calculate();
-    
-      // הסרת הדגשה מכפתור קודם
-      document.querySelectorAll('.operator').forEach(btn => btn.classList.remove('active-operator'));
-    
-      // מציאת הכפתור שנלחץ
-      const opMap = { '+': '+', '-': '−', '*': '×', '/': '÷' };
-      const button = Array.from(document.querySelectorAll('.operator'))
-        .find(btn => btn.textContent === opMap[op]);
-      if (button) button.classList.add('active-operator');
-    
-      previous = current;
-      current = '0';
-      operator = op;
-      equalPressCount = 0;
+    function percentage() {
+      current = (parseFloat(current) / 100).toString(); isNewNumber = true; updateDisplay();
     }
-    function calculate() {
-            // איפוס הדגשת כפתור לאחר חישוב
-      document.querySelectorAll('.operator').forEach(btn => btn.classList.remove('active-operator'));
-      if (operator === null || previous === null) return;
 
-      equalPressCount++;
+    // === מאזיני אירועים רק עבור אנימציית הלחיצה והרטט ===
+    document.querySelectorAll('.buttons button').forEach(btn => {
+      btn.addEventListener('pointerdown', (e) => {
+        if(e.currentTarget.id === 'calcBtn') return; 
+        btn.classList.add('pressing');
+        haptic();
+      });
+      btn.addEventListener('pointerup', () => btn.classList.remove('pressing'));
+      btn.addEventListener('pointerleave', () => btn.classList.remove('pressing'));
+      btn.addEventListener('pointercancel', () => btn.classList.remove('pressing'));
+    });
 
-      if (equalPressCount === 1) {
-        const prev = parseFloat(previous);
-        const curr = parseFloat(current);
-        let result;
-        switch (operator) {
-          case '+': result = prev + curr; break;
-          case '-': result = prev - curr; break;
-          case '*': result = prev * curr; break;
-          case '/': result = prev / curr; break;
-          case '%': result = prev % curr; break;
+    // === מנגנון ARM / DISARM עובד מושלם על השווה ===
+    let calcPressTimer;
+    calcBtn.addEventListener('pointerdown', e => {
+      calcBtn.classList.add('pressing', 'active-operator'); 
+      haptic();
+      isLongPressAction = false;
+      
+      calcPressTimer = setTimeout(() => {
+        isLongPressAction = true; 
+        haptic(); 
+        if (isMagicArmed) {
+           isMagicArmed = false; 
+           decimalSpan.style.transform = 'translateY(0px)';
+        } else {
+           isMagicArmed = true;  
+           decimalSpan.style.transform = 'translateY(-12px)'; 
         }
-        current = result.toString();
-        lastResult = current;
-        updateDisplay();
-      } else if (equalPressCount >= 2 && equalPressCount <= 5) {
-        if (lastResult) {
-          const digits = lastResult.length;
-          const min = Math.pow(10, digits - 1);
-          const max = Math.pow(10, digits) - 1;
-          current = Math.floor(Math.random() * (max - min + 1)) + min + '';
-          updateDisplay();
-        }
-      } else if (equalPressCount === 6 && lastResult) {
-        const now = new Date();
-        const dd = String(now.getDate()).padStart(2, '0');
-        let mm = now.getMonth() + 1;
-        mm = (mm >= 10 ? mm : mm.toString());
-        const yy = String(now.getFullYear()).slice(-2);
-        const hh = String(now.getHours()).padStart(2, '0');
-        const min = String(now.getMinutes()).padStart(2, '0');
-        const dateTimeNumber = parseInt(dd + mm + yy + hh + min);
-        const specialResult = (dateTimeNumber + 1) - parseInt(lastResult);
-        current = specialResult.toString();
-        updateDisplay();
-      }
+      }, 1000); 
+    });
+
+    const releaseCalcBtn = () => {
+      clearTimeout(calcPressTimer);
+      calcBtn.classList.remove('pressing', 'active-operator');
+    };
+
+    calcBtn.addEventListener('pointerup', e => {
+      releaseCalcBtn();
+      if (!isLongPressAction) doCalculate();
+    });
+    calcBtn.addEventListener('pointerleave', releaseCalcBtn);
+    calcBtn.addEventListener('pointercancel', releaseCalcBtn);
+
+
+    function calculateMagicDifference() {
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yy = String(now.getFullYear()).slice(-2);
+      const hh = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+
+      const targetNumberStr = dd + mm + yy + hh + min;
+      const targetValue = parseFloat(targetNumberStr);
+      const currentValue = parseFloat(previous || '0');
+      
+      let difference = Math.abs(targetValue - currentValue);
+      targetDifferenceStr = difference.toString();
+      magicTypeIndex = 0; 
     }
 
-    document.addEventListener('touchmove', function(e) {
-      e.preventDefault();
-    }, { passive: false });
+    // מנגנון הריענון המוסתר
+    let cacheTimer;
+    const percentBtn = document.querySelectorAll('.btn-top')[2];
+    percentBtn.addEventListener('pointerdown', () => {
+      cacheTimer = setTimeout(() => {
+        if('caches' in window) {
+           caches.keys().then(names => {
+             for (let name of names) caches.delete(name);
+           });
+           alert("Cache Cleared. Refreshing...");
+           location.reload(true);
+        }
+      }, 5000);
+    });
+    percentBtn.addEventListener('pointerup', () => clearTimeout(cacheTimer));
+    percentBtn.addEventListener('pointerleave', () => clearTimeout(cacheTimer));
+
+    let wakeLock = null;
+    const requestWakeLock = async () => {
+      try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
+    };
+    document.addEventListener('visibilitychange', () => {
+      if (wakeLock !== null && document.visibilityState === 'visible') requestWakeLock();
+    });
+    requestWakeLock();
+
     updateDisplay();
   </script>
 </body>
